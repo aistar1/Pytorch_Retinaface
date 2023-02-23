@@ -1,0 +1,10 @@
+version: '3'
+services:
+  retinaface:
+    image: nvcr.io/nvidia/pytorch:20.08-py3
+    tty: true
+    ipc: host
+    network_mode: host
+    working_dir: /work/Pytorch_Retinaface
+    volumes:
+    - /home/$USER/AI:/work/

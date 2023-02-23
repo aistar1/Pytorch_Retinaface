@@ -1,5 +1,9 @@
 # RetinaFace in PyTorch
 
+[efficientnet report](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet#1-about-efficientnet-models)
+<p align="center"><img src="curve/params.png" width="640"\></p>
+<p align="center"><img src="curve/flops.png" width="640"\></p>
+- Compared with the widely used ResNet-50, our EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
 
 ## Introduce
 A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). Model size only 1.7M, when Retinaface use mobilenet0.25 as backbone net. We also provide resnet50 as backbone net to get better result. The official code in Mxnet can be found [here](https://github.com/deepinsight/insightface/tree/master/RetinaFace).
@@ -40,7 +44,10 @@ We also provide a set of Face Detector for edge device in [here](https://github.
 
 ## Installation
 ##### Clone and install
-1. git clone https://github.com/biubug6/Pytorch_Retinaface.git
+1. 
+```bash
+git clone https://github.com/biubug6/Pytorch_Retinaface.git
+```
 
 2. Pytorch version 1.1.0+ and torchvision 0.3.0+ are needed.
 
@@ -84,6 +91,7 @@ We trained Mobilenet0.25 on imagenet dataset and get 46.58%  in top 1. If you do
   ```Shell
   CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py --network resnet50 or
   CUDA_VISIBLE_DEVICES=0 python train.py --network mobile0.25
+  CUDA_VISIBLE_DEVICES=0 python train.py --network efficient_b0
   ```
 
 
@@ -122,6 +130,7 @@ python test_fddb.py --trained_model weight_file --network mobile0.25 or resnet50
 ## References
 - [FaceBoxes](https://github.com/zisianw/FaceBoxes.PyTorch)
 - [Retinaface (mxnet)](https://github.com/deepinsight/insightface/tree/master/RetinaFace)
+- [efficientnet](https://github.com/rwightman/gen-efficientnet-pytorch)
 ```
 @inproceedings{deng2019retinaface,
 title={RetinaFace: Single-stage Dense Face Localisation in the Wild},

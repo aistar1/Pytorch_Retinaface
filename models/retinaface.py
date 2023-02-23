@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.models.detection.backbone_utils as backbone_utils
 import torchvision.models._utils as _utils
 import torch.nn.functional as F
+import geffnet
 from collections import OrderedDict
 
 from models.net import MobileNetV1 as MobileNetV1
@@ -68,14 +69,27 @@ class RetinaFace(nn.Module):
         elif cfg['name'] == 'Resnet50':
             import torchvision.models as models
             backbone = models.resnet50(pretrained=cfg['pretrain'])
+        
+        elif cfg['name'] == 'Efficient_b0':
+            import geffnet
+            backbone = geffnet.efficientnet_b0(pretrained=True,drop_rate=0.2, drop_connect_rate=0.2)
+            # backbone = geffnet.efficientnet_b2(pretrained=True,drop_rate=0.3, drop_connect_rate=0.2) # Efficient_b2
+            backbone.train()
 
-        self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
-        in_channels_stage2 = cfg['in_channel']
-        in_channels_list = [
-            in_channels_stage2 * 2,
-            in_channels_stage2 * 4,
-            in_channels_stage2 * 8,
-        ]
+        if  cfg['name'] == 'mobilenet0.25' or cfg['name'] == 'Resnet50':
+            self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
+            in_channels_stage2 = cfg['in_channel']
+            in_channels_list = [
+                in_channels_stage2 * 2,
+                in_channels_stage2 * 4,
+                in_channels_stage2 * 8,
+            ]
+
+        elif cfg['name'] == 'Efficient_b0':
+            self.body = backbone
+            in_channels_list = [80, 112, 192]
+            # in_channels_list = [88, 120, 208] # Efficient_b2
+
         out_channels = cfg['out_channel']
         self.fpn = FPN(in_channels_list,out_channels)
         self.ssh1 = SSH(out_channels, out_channels)
@@ -106,6 +120,9 @@ class RetinaFace(nn.Module):
 
     def forward(self,inputs):
         out = self.body(inputs)
+        
+        if len(out) == 7: # for EfficientNet  IntermediateLayerGetter
+            out = [out[3], out[4], out[5]]
 
         # FPN
         fpn = self.fpn(out)

@@ -80,7 +80,12 @@ class FPN(nn.Module):
 
     def forward(self, input):
         # names = list(input.keys())
-        input = list(input.values())
+
+        #input = list(input.values())
+        try:
+            input = list(input.values())# for resnet50 and mobilenet  ( pytorch model )
+        except :
+            input = input = list(input) # for EfficientNet
 
         output1 = self.output1(input[0])
         output2 = self.output2(input[1])
