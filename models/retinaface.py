@@ -75,6 +75,11 @@ class RetinaFace(nn.Module):
             backbone = geffnet.efficientnet_b0(pretrained=True,drop_rate=0.2, drop_connect_rate=0.2)
             # backbone = geffnet.efficientnet_b2(pretrained=True,drop_rate=0.3, drop_connect_rate=0.2) # Efficient_b2
             backbone.train()
+            
+        elif cfg['name'] == 'Efficient_b1':
+            import geffnet
+            backbone = geffnet.efficientnet_b1(pretrained=True)
+            backbone.train()
 
         if  cfg['name'] == 'mobilenet0.25' or cfg['name'] == 'Resnet50':
             self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
@@ -85,7 +90,7 @@ class RetinaFace(nn.Module):
                 in_channels_stage2 * 8,
             ]
 
-        elif cfg['name'] == 'Efficient_b0':
+        elif cfg['name'] == 'Efficient_b0' or cfg['name'] == 'Efficient_b1':
             self.body = backbone
             in_channels_list = [80, 112, 192]
             # in_channels_list = [88, 120, 208] # Efficient_b2

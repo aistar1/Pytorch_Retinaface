@@ -5,7 +5,7 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 import argparse
 import torch.utils.data as data
-from data import WiderFaceDetection, detection_collate, preproc, cfg_mnet, cfg_re50, cfg_efficient_b0
+from data import WiderFaceDetection, detection_collate, preproc, cfg_mnet, cfg_re50, cfg_efficient_b0, cfg_efficient_b1
 from layers.modules import MultiBoxLoss
 from layers.functions.prior_box import PriorBox
 import time
@@ -15,7 +15,7 @@ from models.retinaface import RetinaFace
 
 parser = argparse.ArgumentParser(description='Retinaface Training')
 parser.add_argument('--training_dataset', default='./data/widerface/train/label.txt', help='Training dataset directory')
-parser.add_argument('--network', default='resnet50', help='Backbone network mobile0.25 or resnet50 or efficient_b0')
+parser.add_argument('--network', default='resnet50', help='Backbone network mobile0.25 or resnet50 or efficient_b0 or efficient_b1')
 parser.add_argument('--num_workers', default=4, type=int, help='Number of workers used in dataloading')
 parser.add_argument('--lr', '--learning-rate', default=1e-3, type=float, help='initial learning rate')
 parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
@@ -36,6 +36,8 @@ elif args.network == "resnet50":
     cfg = cfg_re50
 elif args.network == "efficient_b0":
     cfg = cfg_efficient_b0
+elif args.network == "efficient_b1":
+    cfg = cfg_efficient_b1
 
 rgb_mean = (104, 117, 123) # bgr order
 num_classes = 2
@@ -93,7 +95,7 @@ def train():
     epoch = 0 + args.resume_epoch
     print('Loading Dataset...')
 
-    dataset = WiderFaceDetection( training_dataset,preproc(img_dim, rgb_mean))
+    dataset = WiderFaceDetection( training_dataset,preproc(img_dim, rgb_mean), (img_dim, img_dim))
 
     epoch_size = math.ceil(len(dataset) / batch_size)
     max_iter = max_epoch * epoch_size

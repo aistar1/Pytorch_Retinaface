@@ -205,6 +205,63 @@ def _resize_subtract_mean(image, insize, rgb_mean):
     image -= rgb_mean
     return image.transpose(2, 0, 1)
 
+def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
+    # Resize and pad image while meeting stride-multiple constraints
+    shape = im.shape[:2]  # current shape [height, width]
+    if isinstance(new_shape, int):
+        new_shape = (new_shape, new_shape)
+
+    # Scale ratio (new / old)
+    r = min(new_shape[0] / shape[0], new_shape[1] / shape[1])
+    if not scaleup:  # only scale down, do not scale up (for better val mAP)
+        r = min(r, 1.0)
+
+    # Compute padding
+    ratio = r, r  # width, height ratios
+    new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
+    dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
+    if auto:  # minimum rectangle
+        dw, dh = np.mod(dw, stride), np.mod(dh, stride)  # wh padding
+    elif scaleFill:  # stretch
+        dw, dh = 0.0, 0.0
+        new_unpad = (new_shape[1], new_shape[0])
+        ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
+
+    dw /= 2  # divide padding into 2 sides
+    dh /= 2
+
+    if shape[::-1] != new_unpad:  # resize
+        im = cv2.resize(im, new_unpad, interpolation=cv2.INTER_LINEAR)
+    top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
+    left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
+    im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
+    return im, ratio, (dw, dh)
+
+def xywhn2pad(obj_bbox, obj_keypoints, ratio, padw=0, padh=0):
+    # Convert nx4 boxes from [x, y, w, h] normalized to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
+    # width, height ratios
+
+    for i, _ in enumerate(obj_bbox):
+        obj_bbox[i][0] = ratio[0] * obj_bbox[i][0] + padw  # top left x
+        obj_bbox[i][1] = ratio[1] * obj_bbox[i][1] + padh  # top left y
+        obj_bbox[i][2] = ratio[0] * obj_bbox[i][2] + padw # w
+        obj_bbox[i][3] = ratio[1] * obj_bbox[i][3] + padh  # h
+    for i, _ in enumerate(obj_keypoints):
+        for point in range(5):
+            obj_keypoints[i][point*2] = ratio[0] * obj_keypoints[i][point*2] + padw
+            obj_keypoints[i][point*2+1] = ratio[1] * obj_keypoints[i][point*2+1] + padh
+
+    return obj_bbox, obj_keypoints
+
+def _center_padding(image, rgb_mean, pad_image_flag, boxes, landms, img_dim):
+    if not pad_image_flag:
+        return image, boxes, landms
+    height, width, _ = image.shape
+
+    crop_image, ratio, pad = letterbox(image, (img_dim*2, img_dim*2), color=rgb_mean, auto=False, scaleup=True)  # h,w
+    boxes, landms = xywhn2pad(boxes, landms, ratio, padw=pad[0], padh=pad[1])
+
+    return crop_image, boxes, landms
 
 class preproc(object):
 
@@ -221,7 +278,12 @@ class preproc(object):
 
         image_t, boxes_t, labels_t, landm_t, pad_image_flag = _crop(image, boxes, labels, landm, self.img_dim)
         image_t = _distort(image_t)
-        image_t = _pad_to_square(image_t,self.rgb_means, pad_image_flag)
+        # image_t = _pad_to_square(image_t,self.rgb_means, pad_image_flag)
+
+        cv2.imwrite('123a.jpg',image_t)
+
+        image_t, boxes_t, landm_t = _center_padding(image_t, self.rgb_means, pad_image_flag, boxes_t, landm_t, self.img_dim)
+
         image_t, boxes_t, landm_t = _mirror(image_t, boxes_t, landm_t)
         height, width, _ = image_t.shape
         image_t = _resize_subtract_mean(image_t, self.img_dim, self.rgb_means)

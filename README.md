@@ -1,15 +1,34 @@
 # RetinaFace in PyTorch
 
-[efficientnet report](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet#1-about-efficientnet-models)
-<p align="center"><img src="curve/params.png" width="640"\></p>
-<p align="center"><img src="curve/flops.png" width="640"\></p>
-- Compared with the widely used ResNet-50, our EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
-
-## update
-- support backbone EfficientNet-b1
-
 ## Introduce
 A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). Model size only 1.7M, when Retinaface use mobilenet0.25 as backbone net. We also provide resnet50 as backbone net to get better result. The official code in Mxnet can be found [here](https://github.com/deepinsight/insightface/tree/master/RetinaFace).
+
+
+## Update
+- support backbone EfficientNet-b0 , EfficientNet-b1
+- data augmentation **Mosaic**
+
+## Infomation
+#### backbone
+[efficientnet report](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet#1-about-efficientnet-models)
+
+<table border="0">
+<tr>
+    <td>
+    <img src="curve/params.png" width="100%" />
+    </td>
+    <td>
+    <img src="curve/flops.png", width="100%" />
+    </td>
+</tr>
+</table>
+
+- Compared with the widely used ResNet-50, our EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
+
+#### Mosaic
+Mosaic represents a new data augmentation method that mixes 4 training images. 
+<p align="center"><img src="curve/mosaic_sample.png" width="480"\></p>
+
 
 ## Mobile or Edge device deploy
 We also provide a set of Face Detector for edge device in [here](https://github.com/biubug6/Face-Detector-1MB-with-landmark) from python training to C++ inference.
@@ -134,6 +153,7 @@ python test_fddb.py --trained_model weight_file --network mobile0.25 or resnet50
 - [FaceBoxes](https://github.com/zisianw/FaceBoxes.PyTorch)
 - [Retinaface (mxnet)](https://github.com/deepinsight/insightface/tree/master/RetinaFace)
 - [efficientnet](https://github.com/rwightman/gen-efficientnet-pytorch)
+- [mosaics](https://github.com/ultralytics/yolov5)
 ```
 @inproceedings{deng2019retinaface,
 title={RetinaFace: Single-stage Dense Face Localisation in the Wild},
