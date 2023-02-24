@@ -27,7 +27,7 @@ A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage De
 
 #### Mosaic
 Mosaic represents a new data augmentation method that mixes 4 training images. 
-<p align="center"><img src="curve/mosaic_sample.jpg" width="480"\></p>
+<p align="center"><img src="curve/mosaic_sample.jpg" width="240"\></p>
 
 
 ## Mobile or Edge device deploy
