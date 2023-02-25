@@ -30,6 +30,7 @@ Mosaic represents a new data augmentation method that mixes 4 training images.
 <p align="center"><img src="curve/mosaic_sample.jpg" width="240"\></p>
 
 
+
 ## Mobile or Edge device deploy
 We also provide a set of Face Detector for edge device in [here](https://github.com/biubug6/Face-Detector-1MB-with-landmark) from python training to C++ inference.
 
